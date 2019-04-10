@@ -16,6 +16,7 @@
 # @param manage_gunicorn Allow Installation / Removal of Gunicorn.
 # @param provider What provider to use for installation of the packages, except gunicorn and Python itself.
 # @param use_epel to determine if the epel class is used.
+# @param manage_scl Whether to manage core SCL packages or not.
 #
 # @example install python from system python
 #   class { 'python':
@@ -25,7 +26,7 @@
 #     virtualenv => 'present',
 #     gunicorn   => 'present',
 #   }
-# @example install python3 from scl report
+# @example install python3 from scl repo
 #   class { 'python' :
 #     ensure      => 'present',
 #     version     => 'rh-python36-python',
@@ -53,6 +54,7 @@ class python (
   $rhscl_use_public_repository                    = $python::params::rhscl_use_public_repository,
   Stdlib::Httpurl $anaconda_installer_url         = $python::params::anaconda_installer_url,
   Stdlib::Absolutepath $anaconda_install_path     = $python::params::anaconda_install_path,
+  Boolean $manage_scl                             = $python::params::manage_scl,
 ) inherits python::params {
 
   $exec_prefix = $provider ? {
@@ -61,9 +63,9 @@ class python (
     default => '',
   }
 
-  $allowed_versions = concat(['system', 'pypy'], $valid_versions)
-  unless $version =~ Enum[$allowed_versions] {
-    fail("version needs to be within${allowed_versions}")
+  unless $version =~ Pattern[/\A(python)?[0-9](\.[0-9])+/,
+        /\Apypy\Z/, /\Asystem\Z/, /\Arh-python[0-9]{2}(?:-python)?\Z/] {
+    fail("version needs to be pypy, system or a version string like '3.5' or 'python3.5)")
   }
 
   # Module compatibility check
