@@ -69,7 +69,7 @@ class python::install {
       }
 
       if $pythondev {
-        package { 'python-devel':
+        package { 'python-dev':
           ensure => $dev_ensure,
           name   => $pythondev,
         }
@@ -90,7 +90,7 @@ class python::install {
           Package <| title == 'virtualenv' |> {
             name     => 'virtualenv',
             provider => 'pip',
-            require  => Package['python-devel'],
+            require  => Package['python-dev'],
           }
         } else {
           Package <| title == 'virtualenv' |> {
@@ -211,7 +211,7 @@ class python::install {
             }
           }
           if $pythondev {
-            package { 'python-devel':
+            package { 'python-dev':
               ensure   => $dev_ensure,
               name     => $pythondev,
               alias    => $pythondev,
@@ -226,7 +226,7 @@ class python::install {
             require => Package['python'],
           }
           if $pythondev {
-            package { 'python-devel':
+            package { 'python-dev':
               ensure => $dev_ensure,
               name   => $pythondev,
               alias  => $pythondev,
